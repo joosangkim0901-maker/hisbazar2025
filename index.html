@@ -16,7 +16,6 @@
         /* 1. 기본 스타일 */
         body { margin: 0; padding: 0; background-color: #F4F5F9; font-family: -apple-system, sans-serif; color: #333; overflow-x: hidden; }
         
-        /* 2. 컨테이너 */
         .container { 
             max-width: 500px; 
             margin: 0 auto; 
@@ -25,42 +24,48 @@
             min-height: 100vh; 
         }
 
-        /* 3. 이미지 카드 공통 */
+        /* 2. 이미지 카드 (원인 해결!) */
         .img-card {
             width: 100%;
             display: block;
-            opacity: 0; 
-            /* 더 깊은 곳(100px)에서 올라오게 하여 극적인 효과 */
-            transform: translateY(100px); 
-            transition: opacity 1s ease-out, transform 1s cubic-bezier(0.25, 1, 0.5, 1); 
             
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08); 
+            /* 초기 상태 */
+            opacity: 0; 
+            transform: translateY(80px); 
+            
+            /* 부드러운 움직임 */
+            transition: opacity 1.5s ease-out, transform 1.5s cubic-bezier(0.16, 1, 0.3, 1); 
+            
+            box-shadow: 0 8px 20px rgba(0,0,0,0.07); 
             border-radius: 16px;
             
-            /* [핵심 1] 상품 간격을 120px로 넓혀서 한 화면에 여러 개가 안 걸리게 함 */
-            margin-bottom: 120px; 
+            /* [핵심 수정 1] 간격을 다시 20px로 설정 (초기의 적당한 간격) */
+            margin-bottom: 20px; 
             
-            min-height: 300px; 
+            /* [핵심 수정 2] 문제의 원인이었던 거대한 최소 높이를 삭제! */
+            /* 이제 이미지 높이에 맞춰 자연스럽게 붙습니다. */
+            min-height: 50px; /* 로딩 전 최소한의 영역만 확보 */
             background-color: #eee; 
         }
 
-        /* [핵심 2] 헤더: 첫 화면 독점 설정 */
+        /* 헤더 */
         .header-img {
-            /* 헤더 아래에 거대한 여백(150px)을 주어 첫 번째 상품을 화면 밖으로 밀어냄 */
-            margin-bottom: 150px; 
+            margin-bottom: 20px; /* 헤더 간격도 동일하게 */
             border-radius: 0 0 24px 24px;
             opacity: 1 !important; 
             transform: none !important; 
             min-height: auto;
             box-shadow: none;
+            background-color: transparent;
         }
 
         /* 푸터 */
         .footer-img {
-            margin-top: 40px; 
+            margin-top: 30px; 
             border-radius: 24px 24px 0 0;
             margin-bottom: 0;
             min-height: auto;
+            background-color: transparent;
         }
 
         /* 등장 클래스 */
@@ -102,16 +107,18 @@
             
             const observerOptions = {
                 root: null, 
-                // [핵심 3] 감도 조절: 이미지가 화면의 30%는 들어와야 작동 (0.3)
-                // rootMargin을 줘서 화면 하단보다 조금 더 안쪽으로 들어와야 인식하게 함
-                rootMargin: '0px 0px -50px 0px', 
-                threshold: 0.3 
+                rootMargin: '0px', 
+                threshold: 0.1 
             };
 
             const observer = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
+                entries.forEach((entry) => {
                     if (entry.isIntersecting) {
-                        entry.target.classList.add('visible'); 
+                        // 강제 실행 유지 (움직임 보장)
+                        setTimeout(() => {
+                            entry.target.classList.add('visible');
+                        }, 100); 
+                        
                         observer.unobserve(entry.target); 
                     }
                 });
@@ -123,5 +130,3 @@
     </script>
 </body>
 </html>
-
-
