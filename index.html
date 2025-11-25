@@ -14,12 +14,12 @@
 
     <style>
         /* 1. 기본 스타일 */
-        body { margin: 0; padding: 0; background-color: #F4F5F9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #333; overflow-x: hidden; }
+        body { margin: 0; padding: 0; background-color: #F4F5F9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #333; overflow-x: hidden; }
         
         .container { 
             max-width: 500px; 
             margin: 0 auto; 
-            padding-bottom: 120px; 
+            padding-bottom: 150px; 
             background-color: #F4F5F9; 
             min-height: 100vh; 
         }
@@ -30,59 +30,68 @@
             display: block;
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.06); 
-            margin-bottom: 20px; /* 간격 20px 유지 */
+            
+            /* [수정 1] 간격을 40px로 늘려서 스크롤 공간 확보 */
+            margin-bottom: 40px; 
             background-color: #eee; 
+            
+            /* [핵심 수정] 애니메이션 버그 해결의 열쇠 */
+            /* 이미지가 로딩되기 전에도 최소 300px 높이를 차지하게 해서 */
+            /* 브라우저가 '아직 화면 아래에 있구나'라고 인식하게 만듦 */
+            min-height: 300px;
             
             /* 성능 최적화 */
             will-change: transform, opacity, filter;
             -webkit-backface-visibility: hidden;
         }
 
-        /* 3. 정적 뷰 (헤더, 상품1) */
+        /* 3. 고정된 녀석들 (헤더, 상품1) */
         .static-view {
             opacity: 1;
             transform: none;
             filter: none;
+            /* 고정된 애들은 높이 제한 필요 없음 */
+            min-height: auto; 
         }
 
-        /* 4. [럭셔리 모션의 핵심] */
+        /* 4. 움직이는 녀석들 (상품2 부터) */
+        /* 이 상태가 '초기 상태'입니다. 안 보이고, 아래에 있고, 흐려야 합니다. */
         .scroll-reveal {
             opacity: 0; 
-            
-            /* [비법 1] 깊이감: 약간 작아져 있다가(0.95) 커지면서 올라옴 */
-            transform: translateY(70px) scale(0.95); 
-            
-            /* [비법 2] 블러 효과: 뿌옇게 시작해서 선명해짐 (고급감의 핵심) */
+            /* 더 깊게(100px), 약간 작게(0.95) */
+            transform: translateY(100px) scale(0.95); 
+            /* 블러 효과 (안개) */
             filter: blur(10px); 
             -webkit-filter: blur(10px);
-
-            /* [비법 3] 물리 엔진 곡선: 아주 묵직하게 멈춤 */
-            transition: all 1.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            
+            /* 아주 묵직하고 고급스러운 속도 (1.5초) */
+            transition: all 1.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* 등장 완료 상태 */
+        /* 5. 등장했을 때 (이 클래스가 붙으면 변함) */
         .visible {
             opacity: 1 !important;
-            transform: translateY(0) scale(1) !important; /* 제자리, 원래 크기 */
-            filter: blur(0) !important; /* 선명하게 */
+            transform: translateY(0) scale(1) !important;
+            filter: blur(0) !important;
             -webkit-filter: blur(0) !important;
         }
 
-        /* 헤더 스타일 */
+        /* 헤더 디테일 */
         .header-img {
             border-radius: 0 0 24px 24px;
             box-shadow: none;
-            margin-bottom: 20px; 
+            margin-bottom: 30px; 
             background-color: transparent;
         }
 
-        /* 푸터 스타일 */
+        /* 푸터 디테일 */
         .footer-img {
-            margin-top: 40px; 
+            margin-top: 50px; 
             border-radius: 24px 24px 0 0;
             margin-bottom: 0;
             background-color: transparent;
             box-shadow: none;
+            min-height: auto;
         }
 
         /* 하단 배너 */
@@ -120,13 +129,19 @@
             const observerOptions = {
                 root: null, 
                 rootMargin: '0px', 
-                threshold: 0.15 
+                threshold: 0.1 
             };
 
             const observer = new IntersectionObserver((entries, observer) => {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
+                        // [최후의 안전장치]
+                        // 화면에 보였다고 바로 띄우지 않고 0.1초 기다립니다.
+                        // 브라우저가 "아, 얘는 투명한 상태였지?"라고 인지할 시간을 줍니다.
+                        setTimeout(() => {
+                            entry.target.classList.add('visible');
+                        }, 100);
+                        
                         observer.unobserve(entry.target);
                     }
                 });
