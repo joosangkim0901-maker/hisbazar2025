@@ -24,47 +24,51 @@
             min-height: 100vh; 
         }
 
-        /* 2. 이미지 카드 공통 설정 */
+        /* 2. 이미지 카드 기본 */
         .img-card {
             width: 100%;
             display: block;
             border-radius: 16px;
-            /* 그림자도 조금 더 고급스럽게 퍼지도록 수정 */
             box-shadow: 0 10px 30px rgba(0,0,0,0.06); 
-            
-            /* [핵심] 간격 20px 유지 */
-            margin-bottom: 20px; 
+            margin-bottom: 20px; /* 간격 20px 유지 */
             background-color: #eee; 
             
-            /* 성능 최적화 (부드러움을 위해 추가) */
-            will-change: transform, opacity;
+            /* 성능 최적화 */
+            will-change: transform, opacity, filter;
+            -webkit-backface-visibility: hidden;
         }
 
-        /* 3. [정적 스타일] 헤더, 상품1 (안 움직임) */
+        /* 3. 정적 뷰 (헤더, 상품1) */
         .static-view {
             opacity: 1;
             transform: none;
+            filter: none;
         }
 
-        /* 4. [동적 스타일] 상품2부터 적용될 고급 애니메이션 설정 */
+        /* 4. [럭셔리 모션의 핵심] */
         .scroll-reveal {
             opacity: 0; 
-            /* [핵심 1] 더 깊은 곳(100px)에서, 약간 작아진 상태(scale 0.98)로 시작 */
-            transform: translateY(100px) scale(0.98); 
             
-            /* [핵심 2 & 3] 1.8초 동안 아주 부드러운 감속 곡선(cubic-bezier) 적용 */
-            /* 이 수치가 고급스러운 느낌의 비밀입니다. */
-            transition: all 1.8s cubic-bezier(0.16, 1, 0.3, 1);
+            /* [비법 1] 깊이감: 약간 작아져 있다가(0.95) 커지면서 올라옴 */
+            transform: translateY(70px) scale(0.95); 
+            
+            /* [비법 2] 블러 효과: 뿌옇게 시작해서 선명해짐 (고급감의 핵심) */
+            filter: blur(10px); 
+            -webkit-filter: blur(10px);
+
+            /* [비법 3] 물리 엔진 곡선: 아주 묵직하게 멈춤 */
+            transition: all 1.4s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        /* 등장했을 때 최종 상태 */
+        /* 등장 완료 상태 */
         .visible {
             opacity: 1 !important;
-            /* 원래 위치(0), 원래 크기(1)로 돌아옴 */
-            transform: translateY(0) scale(1) !important;
+            transform: translateY(0) scale(1) !important; /* 제자리, 원래 크기 */
+            filter: blur(0) !important; /* 선명하게 */
+            -webkit-filter: blur(0) !important;
         }
 
-        /* 헤더 스타일 디테일 */
+        /* 헤더 스타일 */
         .header-img {
             border-radius: 0 0 24px 24px;
             box-shadow: none;
@@ -72,9 +76,9 @@
             background-color: transparent;
         }
 
-        /* 푸터 스타일 디테일 */
+        /* 푸터 스타일 */
         .footer-img {
-            margin-top: 40px; /* 푸터는 조금 더 거리를 둠 */
+            margin-top: 40px; 
             border-radius: 24px 24px 0 0;
             margin-bottom: 0;
             background-color: transparent;
@@ -113,28 +117,24 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             
-            // 감지 옵션: 이미지가 10%만 보여도 작동 시작
             const observerOptions = {
                 root: null, 
                 rootMargin: '0px', 
-                threshold: 0.1 
+                threshold: 0.15 
             };
 
             const observer = new IntersectionObserver((entries, observer) => {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
-                        // 화면에 들어오면 visible 클래스 추가 (애니메이션 시작)
                         entry.target.classList.add('visible');
-                        observer.unobserve(entry.target); // 한 번만 실행
+                        observer.unobserve(entry.target);
                     }
                 });
             }, observerOptions);
 
-            // .scroll-reveal 클래스가 붙은 요소들만 감시
             const targets = document.querySelectorAll('.scroll-reveal');
             targets.forEach(target => observer.observe(target));
         });
     </script>
 </body>
 </html>
-
