@@ -24,47 +24,45 @@
             min-height: 100vh; 
         }
 
-        /* 2. 이미지 카드 (원인 해결!) */
+        /* 2. 이미지 카드 기본 설정 (간격 20px 고정) */
         .img-card {
             width: 100%;
             display: block;
-            
-            /* 초기 상태 */
-            opacity: 0; 
-            transform: translateY(80px); 
-            
-            /* 부드러운 움직임 */
-            transition: opacity 1.5s ease-out, transform 1.5s cubic-bezier(0.16, 1, 0.3, 1); 
-            
-            box-shadow: 0 8px 20px rgba(0,0,0,0.07); 
             border-radius: 16px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); /* 그림자 은은하게 */
             
-            /* [핵심 수정 1] 간격을 다시 20px로 설정 (초기의 적당한 간격) */
+            /* [핵심] 간격을 20px로 딱 고정 (가장 예뻤던 간격) */
             margin-bottom: 20px; 
             
-            /* [핵심 수정 2] 문제의 원인이었던 거대한 최소 높이를 삭제! */
-            /* 이제 이미지 높이에 맞춰 자연스럽게 붙습니다. */
-            min-height: 50px; /* 로딩 전 최소한의 영역만 확보 */
+            /* 높이 관련 설정 제거 (간격 벌어짐 방지) */
             background-color: #eee; 
         }
 
-        /* 헤더 */
-        .header-img {
-            margin-bottom: 20px; /* 헤더 간격도 동일하게 */
-            border-radius: 0 0 24px 24px;
-            opacity: 1 !important; 
-            transform: none !important; 
-            min-height: auto;
-            box-shadow: none;
-            background-color: transparent;
+        /* 3. [정적 스타일] 움직이지 않는 녀석들 (헤더, 상품1) */
+        .static-view {
+            opacity: 1;
+            transform: none;
         }
 
-        /* 푸터 */
+        /* 4. [동적 스타일] 스크롤하면 움직일 녀석들 (상품2 부터~) */
+        .scroll-reveal {
+            opacity: 0; 
+            transform: translateY(60px); /* 아래에서 위로 */
+            transition: opacity 1.2s ease-out, transform 1.2s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+
+        /* 헤더 스타일 디테일 */
+        .header-img {
+            border-radius: 0 0 24px 24px;
+            box-shadow: none;
+            margin-bottom: 20px; /* 헤더와 첫상품 사이 간격 */
+        }
+
+        /* 푸터 스타일 디테일 */
         .footer-img {
             margin-top: 30px; 
             border-radius: 24px 24px 0 0;
             margin-bottom: 0;
-            min-height: auto;
             background-color: transparent;
         }
 
@@ -83,16 +81,18 @@
 <body>
 
     <div class="container">
-        <img src="1.png" class="img-card header-img" alt="메인">
+        <img src="1.png" class="img-card header-img static-view" alt="메인">
 
-        <img src="2.png" class="img-card scroll-target" alt="보로탈코">
-        <img src="3.png" class="img-card scroll-target" alt="마데카">
-        <img src="4.png" class="img-card scroll-target" alt="달바">
-        <img src="5.png" class="img-card scroll-target" alt="모로칸">
-        <img src="6.png" class="img-card scroll-target" alt="엘리사브 로얄">
-        <img src="7.png" class="img-card scroll-target" alt="엘리사브 엘릭서">
+        <img src="2.png" class="img-card static-view" alt="보로탈코">
 
-        <img src="8.png" class="img-card scroll-target footer-img" alt="포스터">
+        <img src="3.png" class="img-card scroll-reveal" alt="마데카">
+        
+        <img src="4.png" class="img-card scroll-reveal" alt="달바">
+        <img src="5.png" class="img-card scroll-reveal" alt="모로칸">
+        <img src="6.png" class="img-card scroll-reveal" alt="엘리사브 로얄">
+        <img src="7.png" class="img-card scroll-reveal" alt="엘리사브 엘릭서">
+
+        <img src="8.png" class="img-card scroll-reveal footer-img" alt="포스터">
     </div>
 
     <div class="sticky-bar">
@@ -105,6 +105,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             
+            // 옵션: 약간만 보여도 부드럽게 올라오게 설정
             const observerOptions = {
                 root: null, 
                 rootMargin: '0px', 
@@ -114,17 +115,14 @@
             const observer = new IntersectionObserver((entries, observer) => {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
-                        // 강제 실행 유지 (움직임 보장)
-                        setTimeout(() => {
-                            entry.target.classList.add('visible');
-                        }, 100); 
-                        
+                        entry.target.classList.add('visible');
                         observer.unobserve(entry.target); 
                     }
                 });
             }, observerOptions);
 
-            const targets = document.querySelectorAll('.scroll-target');
+            // .scroll-reveal 클래스가 붙은 애들(3번부터)만 감시
+            const targets = document.querySelectorAll('.scroll-reveal');
             targets.forEach(target => observer.observe(target));
         });
     </script>
