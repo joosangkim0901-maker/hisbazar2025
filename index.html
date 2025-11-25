@@ -3,9 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>히즈메디 사랑 바자회 2025 TOP5</title>
+    
+    <title>히즈메디 사랑 바자회 2025</title>
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="히즈메디 사랑 바자회 TOP5 특가전">
+    <meta property="og:description" content="1년에 단 한번! 빈손으로 가면 후회하는 아이템 5가지 (1층 로비)">
+    
+    <meta property="og:image" content="1.png">
+    <meta property="og:image:width" content="800">
+    <meta property="og:image:height" content="400">
+
     <style>
-        /* 1. 기본 스타일 */
+        /* ... (기존 스타일 코드는 그대로 두거나, 아래 내용이 포함되어 있으니 안심하세요) ... */
+        /* 1. 기본 스타일 세팅 */
         body {
             margin: 0;
             padding: 0;
@@ -15,59 +26,53 @@
             overflow-x: hidden; 
         }
 
-        /* 2. 전체 레이아웃 */
+        /* 2. 메인 컨테이너 */
         .container {
             max-width: 500px; 
             margin: 0 auto;
-            padding-bottom: 120px; 
+            padding-bottom: 100px; 
             background-color: #F4F5F9;
             min-height: 100vh; 
         }
 
-        /* 3. 이미지 카드 (애니메이션 효과) */
+        /* 3. 이미지 카드 */
         .img-card {
             width: 100%;
             display: block;
-            
-            /* 숨김 상태 설정 */
             opacity: 0; 
             transform: translateY(60px); 
             transition: opacity 1s ease-out, transform 1s cubic-bezier(0.25, 1, 0.5, 1); 
-            
-            /* 디자인 디테일 */
             box-shadow: 0 10px 25px rgba(0,0,0,0.08); 
             margin-bottom: 24px; 
             border-radius: 16px;
-            
-            /* 로딩 전 공간 확보 */
             min-height: 300px; 
             background-color: #eee; 
         }
 
-        /* 1번 헤더 (바로 보여줌) */
+        /* 예외: 헤더 */
         .header-img {
-            margin-bottom: 24px; /* 헤더와 첫 상품 사이 간격 확보 */
-            border-radius: 0 0 24px 24px;
+            margin-bottom: 24px; 
+            border-radius: 0 0 24px 24px; 
             opacity: 1 !important; 
             transform: none !important; 
             min-height: auto;
         }
 
-        /* 8번 푸터 */
+        /* 예외: 푸터 */
         .footer-img {
             margin-top: 40px; 
-            border-radius: 24px 24px 0 0;
+            border-radius: 24px 24px 0 0; 
             margin-bottom: 0;
             min-height: auto;
         }
 
-        /* 애니메이션 작동 시 붙을 클래스 */
+        /* 애니메이션 클래스 */
         .visible {
             opacity: 1 !important;
             transform: translateY(0) !important;
         }
 
-        /* 4. 하단 고정 배너 (버튼 삭제 버전) */
+        /* 4. 하단 배너 */
         .sticky-bar {
             position: fixed;
             bottom: 24px;
@@ -77,20 +82,20 @@
             max-width: 440px;
             background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(10px);
-            padding: 15px 0; /* 위아래 여백만 줌 */
+            -webkit-backdrop-filter: blur(10px);
+            padding: 14px 0;
             border-radius: 100px;
             display: flex;
-            justify-content: center; /* [수정] 내용을 가운데 정렬 */
+            justify-content: center;
             align-items: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
             border: 1px solid rgba(255,255,255,0.5);
             z-index: 9999; 
-            text-align: center; /* 텍스트 가운데 정렬 */
+            text-align: center;
         }
 
-        .sticky-text { font-size: 15px; font-weight: 700; color: #111; }
-        .sticky-sub { font-size: 12px; color: #666; display: block; margin-top: 2px;}
-
+        .sticky-text { font-size: 15px; font-weight: 700; color: #111; margin-bottom: 2px; }
+        .sticky-sub { font-size: 12px; color: #666; font-weight: 500; }
     </style>
 </head>
 <body>
@@ -139,4 +144,5 @@
         });
     </script>
 </body>
+
 </html>
