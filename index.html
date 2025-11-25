@@ -14,7 +14,7 @@
 
     <style>
         /* 1. 기본 스타일 */
-        body { margin: 0; padding: 0; background-color: #F4F5F9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #333; overflow-x: hidden; }
+        body { margin: 0; padding: 0; background-color: #F4F5F9; font-family: -apple-system, sans-serif; color: #333; overflow-x: hidden; }
         
         .container { 
             max-width: 500px; 
@@ -29,73 +29,62 @@
             width: 100%;
             display: block;
             border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.06); 
+            /* 그림자 최적화 */
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05); 
             
-            /* [수정 1] 간격을 40px로 늘려서 스크롤 공간 확보 */
-            margin-bottom: 40px; 
+            /* [수정] 간격 24px (가장 보기 좋은 좁은 간격) */
+            margin-bottom: 24px; 
             background-color: #eee; 
             
-            /* [핵심 수정] 애니메이션 버그 해결의 열쇠 */
-            /* 이미지가 로딩되기 전에도 최소 300px 높이를 차지하게 해서 */
-            /* 브라우저가 '아직 화면 아래에 있구나'라고 인식하게 만듦 */
-            min-height: 300px;
+            /* [수정] 버벅임 원인(min-height) 제거. 이제 이미지 크기대로 자연스럽게 붙음 */
             
-            /* 성능 최적화 */
-            will-change: transform, opacity, filter;
-            -webkit-backface-visibility: hidden;
+            /* 성능 최적화: 브라우저에게 "얘는 움직일 거야"라고 미리 알려줌 */
+            will-change: transform, opacity;
         }
 
         /* 3. 고정된 녀석들 (헤더, 상품1) */
+        /* 상품 1번(Pick 1)까지는 애니메이션 없이 고정해서 보여줌 (버벅임 방지) */
         .static-view {
             opacity: 1;
             transform: none;
-            filter: none;
-            /* 고정된 애들은 높이 제한 필요 없음 */
-            min-height: auto; 
         }
 
         /* 4. 움직이는 녀석들 (상품2 부터) */
-        /* 이 상태가 '초기 상태'입니다. 안 보이고, 아래에 있고, 흐려야 합니다. */
         .scroll-reveal {
             opacity: 0; 
-            /* 더 깊게(100px), 약간 작게(0.95) */
-            transform: translateY(100px) scale(0.95); 
-            /* 블러 효과 (안개) */
-            filter: blur(10px); 
-            -webkit-filter: blur(10px);
+            /* [수정] 블러 제거 -> 버벅임 해결 */
+            /* 약간 작아졌다가(0.95) 아래(60px)에서 올라옴 */
+            transform: translateY(60px) scale(0.98); 
             
-            /* 아주 묵직하고 고급스러운 속도 (1.5초) */
-            transition: all 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+            /* 아주 부드러운 가속도 (1.2초) */
+            transition: opacity 1.2s ease-out, transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        /* 5. 등장했을 때 (이 클래스가 붙으면 변함) */
+        /* 등장했을 때 상태 */
         .visible {
             opacity: 1 !important;
             transform: translateY(0) scale(1) !important;
-            filter: blur(0) !important;
-            -webkit-filter: blur(0) !important;
         }
 
         /* 헤더 디테일 */
         .header-img {
             border-radius: 0 0 24px 24px;
             box-shadow: none;
-            margin-bottom: 30px; 
+            margin-bottom: 24px; 
             background-color: transparent;
         }
 
         /* 푸터 디테일 */
         .footer-img {
-            margin-top: 50px; 
+            margin-top: 40px; 
             border-radius: 24px 24px 0 0;
             margin-bottom: 0;
             background-color: transparent;
             box-shadow: none;
-            min-height: auto;
         }
 
         /* 하단 배너 */
-        .sticky-bar { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); width: 85%; max-width: 440px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 14px 0; border-radius: 100px; display: flex; justify-content: center; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.12); border: 1px solid rgba(255,255,255,0.3); z-index: 9999; text-align: center; }
+        .sticky-bar { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); width: 85%; max-width: 440px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 14px 0; border-radius: 100px; display: flex; justify-content: center; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.4); z-index: 9999; text-align: center; }
         .sticky-text { font-size: 15px; font-weight: 700; color: #111; margin-bottom: 2px; }
         .sticky-sub { font-size: 12px; color: #666; font-weight: 500; }
     </style>
@@ -128,20 +117,18 @@
             
             const observerOptions = {
                 root: null, 
-                rootMargin: '0px', 
-                threshold: 0.1 
+                // [핵심] 감지 영역을 화면 하단에서 -20% 위로 당김
+                // 즉, 이미지가 화면 아래쪽에 살짝 걸친 정도로는 반응 안 하고
+                // 스크롤을 좀 더 올려야만 "어? 이제 보여줘야지" 하고 반응함.
+                // 이걸로 '한꺼번에 뜨는 문제' 해결.
+                rootMargin: '0px 0px -20% 0px', 
+                threshold: 0 
             };
 
             const observer = new IntersectionObserver((entries, observer) => {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
-                        // [최후의 안전장치]
-                        // 화면에 보였다고 바로 띄우지 않고 0.1초 기다립니다.
-                        // 브라우저가 "아, 얘는 투명한 상태였지?"라고 인지할 시간을 줍니다.
-                        setTimeout(() => {
-                            entry.target.classList.add('visible');
-                        }, 100);
-                        
+                        entry.target.classList.add('visible');
                         observer.unobserve(entry.target);
                     }
                 });
@@ -153,3 +140,5 @@
     </script>
 </body>
 </html>
+</html>
+
