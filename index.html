@@ -25,30 +25,29 @@
             min-height: 100vh; 
         }
 
-        /* 3. 이미지 카드 (수정됨) */
+        /* 3. 이미지 카드 공통 */
         .img-card {
             width: 100%;
             display: block;
-            
-            /* [수정] 애니메이션 속도를 1.2s로 늦춰서 더 부드럽게 */
             opacity: 0; 
-            transform: translateY(80px); /* 더 깊은 곳에서 올라오게 함 */
-            transition: opacity 1.2s ease-out, transform 1.2s cubic-bezier(0.22, 1, 0.36, 1); 
+            /* 더 깊은 곳(100px)에서 올라오게 하여 극적인 효과 */
+            transform: translateY(100px); 
+            transition: opacity 1s ease-out, transform 1s cubic-bezier(0.25, 1, 0.5, 1); 
             
             box-shadow: 0 10px 25px rgba(0,0,0,0.08); 
             border-radius: 16px;
             
-            /* [핵심 수정] 간격을 24px -> 80px로 대폭 늘림 */
-            /* 뒷 순서 상품들이 화면에 미리 걸쳐있는 것을 방지 */
-            margin-bottom: 80px; 
+            /* [핵심 1] 상품 간격을 120px로 넓혀서 한 화면에 여러 개가 안 걸리게 함 */
+            margin-bottom: 120px; 
             
             min-height: 300px; 
             background-color: #eee; 
         }
 
-        /* 헤더 예외처리 */
+        /* [핵심 2] 헤더: 첫 화면 독점 설정 */
         .header-img {
-            margin-bottom: 40px; /* 헤더와 첫 상품 사이도 조금 더 벌림 */
+            /* 헤더 아래에 거대한 여백(150px)을 주어 첫 번째 상품을 화면 밖으로 밀어냄 */
+            margin-bottom: 150px; 
             border-radius: 0 0 24px 24px;
             opacity: 1 !important; 
             transform: none !important; 
@@ -56,7 +55,7 @@
             box-shadow: none;
         }
 
-        /* 푸터 예외처리 */
+        /* 푸터 */
         .footer-img {
             margin-top: 40px; 
             border-radius: 24px 24px 0 0;
@@ -103,11 +102,10 @@
             
             const observerOptions = {
                 root: null, 
-                // [핵심 설정]
-                // 화면 하단에서 10% 위쪽 지점을 통과해야만 작동하게 함
-                // 즉, 이미지가 화면에 빼꼼 보여도 바로 안 뜨고, 좀 더 올려야 뜸
-                rootMargin: '0px 0px -10% 0px', 
-                threshold: 0.15 
+                // [핵심 3] 감도 조절: 이미지가 화면의 30%는 들어와야 작동 (0.3)
+                // rootMargin을 줘서 화면 하단보다 조금 더 안쪽으로 들어와야 인식하게 함
+                rootMargin: '0px 0px -50px 0px', 
+                threshold: 0.3 
             };
 
             const observer = new IntersectionObserver((entries, observer) => {
@@ -125,4 +123,5 @@
     </script>
 </body>
 </html>
+
 
